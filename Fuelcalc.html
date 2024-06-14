@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Australia Wide Racing Endurance Stint Calculator</title>
+    <style>
+        body {
+            background-color: #264d73; /* Dark blue background */
+            color: #FFFFFF; /* White text */
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #3973ac; /* Blue header */
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 24px; /* Larger font size for the title */
+        }
+
+        .info {
+            padding: 20px;
+            background-color: #3973ac; /* Blue background for info section */
+            margin-bottom: 20px;
+        }
+
+        select, input[type="number"], input[type="text"], button {
+            margin-bottom: 10px;
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
+        }
+
+        select, input[type="number"], input[type="text"] {
+            width: 200px;
+        }
+
+        button {
+            background-color: #3973ac; /* Blue button */
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #264d73; /* Darker blue on hover */
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #FFFFFF; /* White border */
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #3973ac; /* Blue header */
+        }
+
+        footer {
+            background-color: #3973ac; /* Blue footer */
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            color: #FFFFFF; /* White text */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Australia Wide Racing Endurance Stint Calculator</h1>
+    </header>
+
+    <div class="info">
+        <p>This calculator is designed to help sim racing enthusiasts determine the optimal fuel strategy for iRacing endurance events. By inputting key variables such as the car type, current fuel burn rate, average lap time, and race duration, the calculator provides insights into the number of stints required and the fuel burn rate per lap.</p>
+    </div>
+
+    <div>
+        <label for="carSelect">Select your car:</label>
+        <select id="carSelect">
+            <option value="Ferrari GT3">Ferrari GT3</option>
+            <option value="Mercedes GT3">Mercedes GT3</option>
+            <option value="Porsche GT3">Porsche GT3</option>
+            <option value="BMW GT3">BMW GT3</option>
+            <option value="Audi GT3">Audi GT3</option>
+            <option value="McLaren GT3">McLaren GT3</option>
+            <option value="Lamborghini GT3">Lamborghini GT3</option>
+            <option value="Ford Mustang GT3">Ford Mustang GT3</option>
+            <option value="Dallara P217">Dallara P217</option>
+            <option value="All Cars">All GT3 Cars</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="currentBurnRate">Current fuel burn rate (liters per lap):</label>
+        <input type="number" id="currentBurnRate" step="0.01" required>
+    </div>
+
+    <div>
+        <label for="averageLapTime">Average lap time (minutes.seconds):</label>
+        <input type="text" id="averageLapTime" placeholder="e.g., 1.30.500" required>
+    </div>
+
+    <div>
+        <label for="raceDuration">Total race duration (minutes):</label>
+        <input type="number" id="raceDuration" required>
+    </div>
+
+    <button onclick="calculate()">Calculate</button>
+    <div id="calculationResult"></div>
+
+    <footer>
+        <p>Written by <a href="mailto:clintcol1@outlook.com">Clint Collard</a></p>
+    </footer>
+
+    <script>
+        function calculate() {
+            // Get user inputs
+            const currentBurnRate = parseFloat(document.getElementById('currentBurnRate').value);
+            const averageLapTimeString = document.getElementById('averageLapTime').value;
+            const averageLapTimeParts = averageLapTimeString.split('.');
+            const averageLapTimeMinutes = parseInt(averageLapTimeParts[0]);
+            const averageLapTimeSeconds = parseInt(averageLapTimeParts[1]);
+            const averageLapTimeMilliseconds = parseInt(averageLapTimeParts[2]);
+            const raceDuration = parseInt(document.getElementById('raceDuration').value);
+
+            // Perform calculations
+            let result = '<h2>Fuel Burn Rate and Stint Strategy</h2>';
+            const carSelect = document.getElementById('carSelect');
+            const selectedCar = carSelect.value;
+
+            if (selectedCar === "All Cars") {
+                const cars = carSelect.querySelectorAll('option');
+                result += '<div id="allCarsResult">';
+                cars.forEach(car => {
+                    const carName = car.value;
+                    if (carName !== "Custom Car" && carName !== "All Cars") {
+                        const tankSize = getTankSize(carName);
+                        result += performCalculations(carName, tankSize, currentBurnRate, averageLapTimeMinutes, averageLapTimeSeconds, averageLapTimeMilliseconds, raceDuration);
+                    }
+                });
+                result += '</div>';
+            } else {
+                const tankSize = getTankSize(selectedCar);
+                result += performCalculations(selectedCar, tankSize, currentBurnRate, averageLapTimeMinutes, averageLapTimeSeconds, averageLapTimeMilliseconds, raceDuration);
+            }
+
+            // Display the result
+            document.getElementById('calculationResult').innerHTML = result;
+        }
+
+        function performCalculations(carName, tankSize, currentBurnRate, averageLapTimeMinutes, averageLapTimeSeconds, averageLapTimeMilliseconds, raceDuration) {
+            let result = `<p>Car: ${carName}</p>`;
+            result += '<table><tr><th>Laps</th><th>Fuel Burn Rate (Liters per Lap)</th><th>Stints for Race</th></tr>';
+
+            for (let additionalLaps = 0; additionalLaps <= 4; additionalLaps++) {
+                const totalLaps = Math.floor(tankSize / currentBurnRate) + additionalLaps;
+                const fuelBurnRatePerLap = tankSize / totalLaps;
+                const lapsPerStint = Math.floor(tankSize / fuelBurnRatePerLap);
+
+                const adjustedRaceDuration = raceDuration - (additionalLaps * (1 + 6 / 60)); // Adjust for pit stop time
+
+                const numberOfStints = Math.ceil(adjustedRaceDuration / ((averageLapTimeMinutes + averageLapTimeSeconds / 60 + averageLapTimeMilliseconds / 60000) * lapsPerStint + 1 + 6 / 60));
+
+                result += `<tr><td>${totalLaps}</td><td>${fuelBurnRatePerLap.toFixed(2)}</td><td>${numberOfStints}</td></tr>`;
+            }
+
+            result += '</table>';
+            return result;
+        }
+
+        function getTankSize(carName) {
+            // Define tank sizes for each car
+            const tankSizes = {
+                "Ferrari GT3": 104,
+                "Mercedes GT3": 106,
+                "Porsche GT3": 100,
+                "BMW GT3": 103,
+                "Audi GT3": 104,
+                "McLaren GT3": 101,
+                "Lamborghini GT3": 104,
+                "Ford Mustang GT3": 110,
+                "Dallara P217": 75,
+                "All Cars": 0 // Placeholder for all cars
+            };
+
+            return tankSizes[carName] || 0; // Return 0 for unknown cars
+        }
+    </script>
+</body>
+</html>
