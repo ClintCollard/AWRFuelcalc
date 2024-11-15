@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Australia Wide Racing Endurance Stint Calculator</title>
+    <style>
+        body {
+            background-color: #264d73; /* Dark blue background */
+            color: #FFFFFF; /* White text */
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #3973ac; /* Blue header */
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 24px; /* Larger font size for the title */
+        }
+
+        .author {
+            font-size: 14px; /* Smaller font size for the author */
+        }
+
+        .form-container {
+            width: 80%;
+            max-width: 800px;
+            margin: 30px auto;
+            background-color: #3a5a7c;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        label {
+            display: inline-block;
+            width: 250px;
+            text-align: right;
+            margin-right: 10px;
+        }
+
+        input[type="number"], input[type="text"], select, button {
+            margin-bottom: 10px;
+            padding: 6px 10px;
+            border: 1px solid #ffffff;
+            border-radius: 4px;
+            width: 150px; /* Smaller width for the inputs */
+        }
+
+        button {
+            background-color: #3973ac; /* Blue button */
+            color: white;
+            cursor: pointer;
+            padding: 8px 15px;
+        }
+
+        button:hover {
+            background-color: #264d73; /* Darker blue on hover */
+        }
+
+        .form-row {
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #FFFFFF; /* White border */
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #3973ac; /* Blue header */
+        }
+
+        .calculation-result {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .calculation-result h2 {
+            margin-bottom: 10px;
+        }
+
+        .calculation-result table {
+            margin-top: 10px;
+            width: 80%;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Australia Wide Racing Endurance Stint Calculator</h1>
+        <p class="author">Written by <a href="mailto:clintcol1@outlook.com" style="color: #fff;">Clint Collard</a></p>
+    </header>
+
+    <div class="form-container">
+        <div class="info">
+            <p>This calculator helps sim racers determine fuel strategy for endurance events. Enter car type, fuel burn rate, lap time, and race duration to calculate stints and fuel needs.</p>
+        </div>
+
+        <div class="form-row">
+            <label for="carSelect">Select your car:</label>
+            <select id="carSelect">
+                <option value="Ferrari GT3">Ferrari GT3</option>
+                <option value="Mercedes GT3">Mercedes GT3</option>
+                <option value="Porsche GT3">Porsche GT3</option>
+                <option value="BMW GT3">BMW GT3</option>
+                <option value="Mustang GT3">Mustang GT3</option>
+                <option value="Audi GT3">Audi GT3</option>
+                <option value="McLaren GT3">McLaren GT3</option>
+                <option value="Lamborghini GT3">Lamborghini GT3</option>
+                <option value="Corvette GT3">Corvette GT3</option>
+                <option value="LMP2">LMP2</option>
+                <option value="All Cars">All Cars</option>
+            </select>
+        </div>
+
+        <div class="form-row">
+            <label for="currentBurnRate">Fuel burn rate (liters per lap):</label>
+            <input type="number" id="currentBurnRate" step="0.01" required>
+        </div>
+
+        <div class="form-row">
+            <label for="averageLapTime">Average lap time (minutes.seconds):</label>
+            <input type="text" id="averageLapTime" placeholder="e.g., 1.30.500" required>
+        </div>
+
+        <div class="form-row">
+            <label for="raceDuration">Race duration (minutes):</label>
+            <input type="number" id="raceDuration" required>
+        </div>
+
+        <div class="form-row">
+            <label for="pitStopDuration">Pit stop duration (seconds):</label>
+            <input type="number" id="pitStopDuration" value="60">
+        </div>
+
+        <div class="form-row">
+            <label for="fuelTankSize">Adjust fuel tank size by %:</label>
+            <input type="number" id="fuelTankSize" value="100" step="1" min="1">
+        </div>
+
+        <div class="form-row">
+            <button onclick="calculate()">Calculate</button>
+        </div>
+
+        <div id="calculationResult" class="calculation-result"></div>
+    </div>
+
+    <script>
+        function calculate() {
+            // Get user inputs
+            const currentBurnRate = parseFloat(document.getElementById('currentBurnRate').value);
+            const averageLapTimeString = document.getElementById('averageLapTime').value;
+            const averageLapTimeParts = averageLapTimeString.split('.');
+            const averageLapTimeMinutes = parseInt(averageLapTimeParts[0]);
+            const averageLapTimeSeconds = parseInt(averageLapTimeParts[1]);
+            const averageLapTimeMilliseconds = parseInt(averageLapTimeParts[2]);
+            const raceDuration = parseInt(document.getElementById('raceDuration').value);
+            const pitStopDuration = parseInt(document.getElementById('pitStopDuration').value);
+            const fuelTankAdjustment = parseFloat(document.getElementById('fuelTankSize').value) / 100;
+
+            const carSelect = document.getElementById('carSelect');
+            const selectedCar = carSelect.value;
+
+            let result = `<h2>Fuel Burn Rate and Stint Strategy</h2>`;
+            const tankSize = getTankSize(selectedCar) * fuelTankAdjustment;
+            result += performCalculations(selectedCar, tankSize, currentBurnRate, averageLapTimeMinutes, averageLapTimeSeconds, averageLapTimeMilliseconds, raceDuration, pitStopDuration);
+
+            // Display total race laps and fuel excluding final pit time
+            const lapTimeInMinutes = averageLapTimeMinutes + (averageLapTimeSeconds / 60) + (averageLapTimeMilliseconds / 60000);
+            const { totalRaceLaps, totalRaceFuel } = calculateTotalRaceLaps(lapTimeInMinutes, currentBurnRate, raceDuration, pitStopDuration, tankSize);
+
+            result += `<h2>Total Race Details</h2>`;
+            result += `<p><strong>Total Race Laps:</strong> ${totalRaceLaps}</p>`;
+            result += `<p><strong>Total Race Fuel Needed:</strong> ${totalRaceFuel.toFixed(2)} Liters</p>`;
+
+            document.getElementById('calculationResult').innerHTML = result;
+        }
+
+        function performCalculations(carName, tankSize, currentBurnRate, avgLapTimeMin, avgLapTimeSec, avgLapTimeMs, raceDuration, pitStopDuration) {
+            let result = `<p>Car: ${carName}</p>`;
+            result += '<table><tr><th>Laps</th><th>Fuel Burn Rate (Liters per Lap)</th><th>Stints for Race</th></tr>';
+
+            for (let additionalLaps = 0; additionalLaps <= 4; additionalLaps++) {
+                const totalLaps = Math.floor(tankSize / currentBurnRate) + additionalLaps;
+                const fuelBurnRatePerLap = tankSize / totalLaps;
+                const lapsPerStint = Math.floor(tankSize / fuelBurnRatePerLap);
+
+                const adjustedRaceDuration = raceDuration - (additionalLaps * (1 + 6 / 60)); // Adjust for pit stop time
+                const numberOfStints = Math.ceil(adjustedRaceDuration / ((avgLapTimeMin + avgLapTimeSec / 60 + avgLapTimeMs / 60000) * lapsPerStint + 1 + 6 / 60 + (pitStopDuration / 60)));
+
+                result += `<tr><td>${totalLaps}</td><td>${fuelBurnRatePerLap.toFixed(2)}</td><td>${numberOfStints}</td></tr>`;
+            }
+
+            result += '</table>';
+            return result;
+        }
+
+        function calculateTotalRaceLaps(lapTimeInMinutes, burnRate, raceDuration, pitStopDuration, tankSize) {
+            let totalRaceLaps = Math.floor(raceDuration / lapTimeInMinutes);
+            const totalPitStops = Math.floor(totalRaceLaps / Math.floor(tankSize / burnRate)) - 1;
+
+            const totalPitTime = totalPitStops * (pitStopDuration / 60);
+            totalRaceLaps = Math.floor((raceDuration - totalPitTime) / lapTimeInMinutes);
+
+            if ((raceDuration - totalPitTime) % lapTimeInMinutes > 0) {
+                totalRaceLaps += 1;
+            }
+
+            const totalRaceFuel = totalRaceLaps * burnRate;
+            return { totalRaceLaps, totalRaceFuel };
+        }
+
+        function getTankSize(carName) {
+            const tankSizes = {
+                "Ferrari GT3": 104,
+                "Mercedes GT3": 106,
+                "Porsche GT3": 100,
+                "BMW GT3": 103,
+                "Mustang GT3": 110,
+                "Audi GT3": 104,
+                "McLaren GT3": 110,
+                "Lamborghini GT3": 104,
+                "Corvette GT3": 104,
+                "LMP2": 75,
+                "All Cars": 0
+            };
+
+            return tankSizes[carName] || 0;
+        }
+    </script>
+</body>
+</html>
