@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Australia Wide Racing Endurance Stint Calculator v4.1 - iRacing 2026 Season 3</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600;700&family=DM+Mono:wght@300;400;500&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --blue-deep:#0d1f35;--blue-mid:#142843;--blue-panel:#1a3354;--blue-bright:#2a5080;
+            --blue-header:#1e3f66;--accent:#4da6ff;--accent-dim:rgba(77,166,255,0.10);
+            --gold:#f0b942;--green:#3dd68c;--text:#d0e4f5;--text2:#7aadd4;--text3:#3d6a96;
+            --border:#1e3d5c;--border2:#264f78;
+            --mono:'DM Mono',monospace;--head:'Teko',sans-serif;--body:'Barlow',sans-serif;
+        }
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        body{background-color:var(--blue-deep);color:var(--text);font-family:var(--body);font-size:15px;line-height:1.5;min-height:100vh;background-image:radial-gradient(ellipse 70% 50% at 50% -10%,rgba(30,80,140,0.5) 0%,transparent 60%),repeating-linear-gradient(90deg,transparent 0px,transparent 59px,rgba(77,166,255,0.03) 59px,rgba(77,166,255,0.03) 60px),repeating-linear-gradient(0deg,transparent 0px,transparent 59px,rgba(77,166,255,0.02) 59px,rgba(77,166,255,0.02) 60px)}
+        header{background:linear-gradient(135deg,var(--blue-header) 0%,#1a3a60 100%);border-bottom:2px solid var(--accent);box-shadow:0 4px 32px rgba(0,0,0,0.4);padding:24px 32px 20px;text-align:center;position:relative;overflow:hidden}
+        header::before{content:'';position:absolute;top:0;left:-60px;right:-60px;bottom:0;background:repeating-linear-gradient(-45deg,transparent,transparent 18px,rgba(77,166,255,0.025) 18px,rgba(77,166,255,0.025) 19px);pointer-events:none}
+        .header-inner{position:relative;z-index:1}
+        header h1{font-family:var(--head);font-size:38px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#fff;line-height:1.1;text-shadow:0 0 30px rgba(77,166,255,0.4)}
+        header h1 span{color:var(--accent)}
+        .header-sub{margin-top:6px;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--text2);font-family:var(--mono)}
+        .version-tag{display:inline-block;margin-left:10px;font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--blue-deep);background:var(--accent);padding:2px 8px;border-radius:3px;vertical-align:middle}
+        .author{margin-top:10px;font-size:12px;color:var(--text3);letter-spacing:1px}
+        .form-container{width:90%;max-width:820px;margin:36px auto 48px}
+        .info{background:var(--accent-dim);border:1px solid rgba(77,166,255,0.2);border-left:3px solid var(--accent);border-radius:4px;padding:12px 16px;margin-bottom:28px;font-size:13px;color:var(--text2);letter-spacing:0.3px;font-family:var(--mono);line-height:1.7}
+        .section-title{font-family:var(--head);font-size:20px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:10px}
+        .section-title::before{content:'';display:block;width:4px;height:20px;background:var(--accent);border-radius:2px}
+        .inputs-grid{background:var(--blue-panel);border:1px solid var(--border);border-radius:8px;padding:24px;margin-bottom:20px;box-shadow:0 4px 24px rgba(0,0,0,0.25)}
+        .form-row{display:flex;align-items:center;margin-bottom:14px}
+        .form-row:last-child{margin-bottom:0}
+        label{display:block;width:270px;flex-shrink:0;text-align:right;padding-right:16px;font-size:13px;letter-spacing:0.5px;color:var(--text2);font-weight:500}
+        input[type="number"],input[type="text"],select{background:var(--blue-mid);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:14px;padding:8px 12px;border-radius:4px;outline:none;width:200px;transition:border-color 0.2s,box-shadow 0.2s;-webkit-appearance:none;appearance:none}
+        select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237aadd4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;cursor:pointer}
+        select option{background:var(--blue-mid)}
+        input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-dim)}
+        input::placeholder{color:var(--text3);font-size:12px}
+        .mode-btn{background:var(--blue-mid);color:var(--text2);border:1px solid var(--border2);border-radius:4px;font-family:var(--head);font-size:14px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;padding:7px 14px;cursor:pointer;transition:all 0.15s}
+        .mode-btn:hover{background:var(--blue-bright)}
+        .mode-btn-active{background:var(--accent);color:var(--blue-deep);border-color:var(--accent)}
+        .btn-row{margin-top:24px;display:flex;justify-content:center;gap:12px}
+        button.calc-btn{background:var(--accent);color:var(--blue-deep);border:none;border-radius:4px;font-family:var(--head);font-size:20px;font-weight:700;letter-spacing:3px;text-transform:uppercase;padding:12px 48px;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 16px rgba(77,166,255,0.3)}
+        button.calc-btn:hover{background:#6bbfff;box-shadow:0 6px 28px rgba(77,166,255,0.5);transform:translateY(-2px)}
+        button.calc-btn:active{transform:translateY(0)}
+        button.reset-btn{background:transparent;color:var(--text2);border:1px solid var(--border2);border-radius:4px;font-family:var(--head);font-size:20px;font-weight:700;letter-spacing:3px;text-transform:uppercase;padding:12px 32px;cursor:pointer;transition:all 0.2s}
+        button.reset-btn:hover{border-color:var(--text2);color:var(--text);background:rgba(255,255,255,0.05);transform:translateY(-2px)}
+        button.reset-btn:active{transform:translateY(0)}
+        #calculationResult{margin-top:32px}
+        #calculationResult h2{font-family:var(--head);font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#fff;margin:28px 0 12px;display:flex;align-items:center;gap:10px}
+        #calculationResult h2::before{content:'';display:block;width:4px;height:22px;background:var(--gold);border-radius:2px;flex-shrink:0}
+        .car-label{font-family:var(--mono);font-size:12px;color:var(--text2);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;padding:6px 12px;background:var(--accent-dim);border-left:2px solid var(--accent);display:inline-block;border-radius:0 3px 3px 0}
+        table{border-collapse:collapse;width:100%;margin-top:4px;border-radius:6px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.3)}
+        th,td{border:1px solid var(--border);padding:11px 16px;text-align:left}
+        th{background:var(--blue-header);font-family:var(--head);font-size:14px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--accent);border-color:var(--border2)}
+        tbody tr{background:var(--blue-panel);transition:background 0.15s}
+        tbody tr:nth-child(even){background:var(--blue-mid)}
+        tbody tr:hover{background:var(--blue-bright)}
+        tbody tr.base-row{background:rgba(77,166,255,0.08);border-left:3px solid var(--accent)}
+        tbody tr.base-row:hover{background:rgba(77,166,255,0.14)}
+        td{font-family:var(--mono);font-size:14px;color:var(--text);border-color:var(--border)}
+        td:first-child{font-size:18px;font-weight:500;color:var(--accent)}
+        td:last-child{color:var(--gold)}
+        td.fuel-save-val{color:var(--green)}
+        td.base-label{color:var(--text3);font-size:12px;letter-spacing:1px;text-transform:uppercase}
+        td.pit-time-val{color:#f0b942;font-variant-numeric:tabular-nums}
+        td.last-tank-val{color:#a78bfa;font-variant-numeric:tabular-nums}
+        .last-tank-cards{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:4px}
+        .last-tank-card{background:var(--blue-panel);border:1px solid var(--border);border-radius:6px;padding:14px 12px;display:flex;flex-direction:column;gap:3px}
+        .last-tank-card.card-base{border-color:var(--accent);background:rgba(77,166,255,0.07)}
+        .card-scenario{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--accent)}
+        .card-laps{font-family:var(--mono);font-size:11px;color:var(--text3);margin-bottom:6px}
+        .card-litres{font-family:var(--mono);font-size:22px;font-weight:500;color:#a78bfa;line-height:1}
+        .card-pit-label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-top:8px;font-family:var(--mono)}
+        .card-pit-time{font-family:var(--mono);font-size:14px;color:#f0b942}
+        .card-tyre-note{font-size:10px;font-family:var(--mono);margin-top:5px;padding:3px 6px;border-radius:3px;display:inline-block;cursor:help;position:relative}
+        .card-tyre-note.tyres-on{color:var(--green);background:rgba(61,214,140,0.1);border:1px solid rgba(61,214,140,0.25)}
+        .card-tyre-note.tyres-off{color:#f0b942;background:rgba(240,185,66,0.1);border:1px solid rgba(240,185,66,0.25)}
+        .card-tyre-note .card-tip{visibility:hidden;opacity:0;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);width:220px;background:var(--blue-header);border:1px solid var(--border2);border-radius:6px;padding:10px 12px;font-size:11px;color:var(--text2);line-height:1.6;z-index:100;pointer-events:none;transition:opacity 0.15s;box-shadow:0 4px 20px rgba(0,0,0,0.5);white-space:normal}
+        .card-tyre-note:hover .card-tip{visibility:visible;opacity:1}
+        .total-race-detail{background:var(--blue-panel);border:1px solid var(--border);border-radius:6px;padding:20px 24px;display:flex;gap:48px;flex-wrap:wrap}
+        .total-race-detail .stat{display:flex;flex-direction:column;gap:4px}
+        .stat-label{font-family:var(--mono);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--text3)}
+        .stat-value{font-family:var(--mono);font-size:32px;color:var(--gold);line-height:1}
+        .stat-value span{font-size:14px;color:var(--text2);margin-left:6px}
+        .error-msg{background:rgba(255,80,80,0.1);border:1px solid rgba(255,80,80,0.3);border-radius:4px;padding:10px 16px;color:#ff8080;font-family:var(--mono);font-size:12px;margin-top:12px}
+        .discord-btn{background:transparent;color:#5865f2;border:1px solid #5865f2;border-radius:4px;font-family:var(--head);font-size:16px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:9px 24px;cursor:pointer;transition:all 0.2s;margin-top:16px}
+        .discord-btn:hover{background:#5865f2;color:#fff;transform:translateY(-2px);box-shadow:0 4px 16px rgba(88,101,242,0.4)}
+        .discord-btn:active{transform:translateY(0)}
+        .discord-btn.copied{background:#3dd68c;border-color:#3dd68c;color:var(--blue-deep)}
+        .tooltip-wrap{position:relative;display:inline-flex;align-items:center;gap:6px}
+        .tooltip-icon{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:var(--blue-bright);border:1px solid var(--border2);color:var(--text2);font-size:11px;font-family:var(--mono);cursor:help;flex-shrink:0;line-height:1}
+        .tooltip-icon:hover{background:var(--accent);color:var(--blue-deep);border-color:var(--accent)}
+        .tooltip-box{visibility:hidden;opacity:0;position:absolute;left:24px;top:50%;transform:translateY(-50%);width:300px;background:var(--blue-header);border:1px solid var(--border2);border-radius:6px;padding:12px 14px;font-family:var(--body);font-size:12px;color:var(--text2);line-height:1.7;z-index:100;pointer-events:none;transition:opacity 0.15s;box-shadow:0 4px 20px rgba(0,0,0,0.5)}
+        .tooltip-box strong{color:var(--text);display:block;margin-bottom:4px;font-size:13px}
+        .tooltip-box .tip-step{color:var(--accent);font-family:var(--mono);font-size:11px;margin-top:6px;display:block}
+        .tooltip-icon:hover + .tooltip-box,.tooltip-wrap:hover .tooltip-box{visibility:visible;opacity:1}
+        @keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        .animate-in{animation:slideIn 0.3s ease forwards}
+        @media(max-width:700px){.last-tank-cards{grid-template-columns:repeat(2,1fr)}}
+        @media(max-width:640px){header h1{font-size:26px}label{width:180px;font-size:12px}input[type="number"],input[type="text"],select{width:150px}.form-container{width:96%}}
+    </style>
+    <!-- Analytics: GoatCounter (privacy-friendly, no cookies) -->
+    <script data-goatcounter="https://awrfuelcalc.goatcounter.com/count"
+            async src="//gc.zgo.at/count.js"></script>
+</head>
+<body>
+<header>
+    <div class="header-inner">
+        <h1>Australia Wide Racing<br><span>Endurance Stint Calculator</span></h1>
+        <p class="header-sub">iRacing 2026 Season 3 Update <span class="version-tag">v4.1</span></p>
+        <p class="author">Written by Clint Collard</p>
+    </div>
+</header>
+<div class="form-container">
+    <div class="info">This calculator helps sim racers determine fuel strategy for endurance events. Enter car type, fuel burn rate, lap time, and race duration to calculate stints and fuel needs.</div>
+
+    <details class="how-this-works">
+        <summary>How this works &mdash; click to expand</summary>
+        <div class="htw-body">
+            <div class="htw-section">
+                <div class="htw-heading">What it does</div>
+                <p>Simulates your entire race lap-by-lap using the pit stop rules of the series you are racing under. It shows you five stint strategies at once: your natural pace (Base) plus four fuel-saving scenarios that stretch your tank by 1 to 4 extra laps per stint.</p>
+            </div>
+
+            <div class="htw-section">
+                <div class="htw-heading">The key insight</div>
+                <p>Fuel saving is worth doing when the time saved by <strong>skipping one pit stop</strong> is bigger than the total time lost from driving slower every lap.</p>
+                <p>A pit stop under Default GT3 rules costs around 60-90 seconds. If saving fuel lets you avoid one of those stops in a 24-hour race, that is 60-90 seconds gained. If saving 0.1 s/lap over 700 laps only costs you 70 seconds, you come out ahead.</p>
+                <p>The calculator shows exactly where that break-even sits for your car and race.</p>
+            </div>
+
+            <div class="htw-section">
+                <div class="htw-heading">What the columns mean</div>
+                <div class="htw-glossary">
+                    <div><strong>Laps / Tank</strong> &mdash; how many laps you can complete on one full tank at that scenario&apos;s burn rate</div>
+                    <div><strong>Burn Rate (L / Lap)</strong> &mdash; the fuel per lap needed to hit that stint length</div>
+                    <div><strong>Fuel Save (L / Lap)</strong> &mdash; how much less fuel per lap you need to burn vs your natural pace</div>
+                    <div><strong>Pit Stops</strong> &mdash; total number of pit stops for the race (not counting the flag-to-flag last stint)</div>
+                    <div><strong>Pit Time Cost</strong> &mdash; total time spent in the pit lane across the race</div>
+                    <div><strong>Last Tank (L)</strong> &mdash; fuel needed for the final stint. Smaller number = shorter last stop</div>
+                    <div><strong>Stints</strong> &mdash; number of stints including the last one</div>
+                </div>
+            </div>
+
+            <div class="htw-section">
+                <div class="htw-heading">Why the ruleset dropdown matters</div>
+                <p>iRacing 2026 Season 3 introduced different pit stop rules per series:</p>
+                <ul class="htw-list">
+                    <li><strong>Default</strong> &mdash; sequential (fuel first, then tyres). Most series. Skipping tyres saves ~20 seconds.</li>
+                    <li><strong>IMSA</strong> &mdash; simultaneous (fuel and tyres at once). Watkins Glen 6H, Petit LeMans etc. Skipping tyres only saves time on partial fills.</li>
+                    <li><strong>NEC</strong> &mdash; Nurburgring 24H. Simultaneous but fuel fills 3x slower (~120s for full tank).</li>
+                    <li><strong>DTM</strong> &mdash; simultaneous with 3x faster tyres (~7s vs 20s).</li>
+                </ul>
+                <p>Pick the ruleset first and the car list filters to what actually races under it.</p>
+            </div>
+
+            <div class="htw-section">
+                <div class="htw-heading">Double stinting tyres</div>
+                <p>Under sequential rules (Default GT3, GTP, LMP2, Porsche Cup) you can skip the tyre change on selected pit stops. Every skipped tyre change saves the tyre change time (usually 20s) on that stop. Great for endurance events where tyre life allows it.</p>
+            </div>
+
+            <div class="htw-section">
+                <div class="htw-heading">One more thing</div>
+                <p>The <strong>Full Stop Time</strong> input matters. Measure it in-sim by driving into the pit box with a full tank of fuel and requesting tyres, timing from entry line to exit line. The calculator works backwards from that number to figure out every partial stop scenario.</p>
+            </div>
+        </div>
+    </details>
+    <div class="inputs-grid">
+        <div class="section-title">Race Parameters</div>
+        <div class="form-row">
+            <label for="masterRuleset">
+                <div class="tooltip-wrap">
+                    <span>Ruleset:</span>
+                    <span class="tooltip-icon">?</span>
+                    <div class="tooltip-box">
+                        <strong>Series ruleset defines the pit stop rules</strong><br><br>
+                        <strong style="color:var(--accent)">Default</strong> - most iRacing series. Fuel then tyres sequentially for GT3/GTP/LMP2/Cup.<br><br>
+                        <strong style="color:var(--accent)">IMSA</strong> - IMSA WeatherTech series (Sebring, Petit LeMans, etc). Fuel and tyres simultaneous.<br><br>
+                        <strong style="color:var(--accent)">NEC</strong> - Nurburgring 24H. Simultaneous stops for GT3/GTP/LMP2 with 3x slower fuel for GT3 and Cup.<br><br>
+                        <strong style="color:var(--accent)">DTM</strong> - DTM series. Simultaneous, tyres 3x faster (GT3 only).<br><br>
+                        <span class="tip-step">Changing ruleset filters the car list below.</span>
+                    </div>
+                </div>
+            </label>
+            <select id="masterRuleset" onchange="updateMasterRuleset()">
+                <option value="default">Default</option>
+                <option value="imsa">IMSA</option>
+                <option value="nec">NEC</option>
+                <option value="dtm">DTM</option>
+            </select>
+        </div>
+
+        <div class="form-row">
+            <label for="categorySelect">Category:</label>
+            <select id="categorySelect" onchange="updateCategoryUI()">
+                <option value="GTP">GTP</option>
+                <option value="GT3">GT3</option>
+                <option value="Porsche Cup">Porsche Cup</option>
+                <option value="LMP2">LMP2</option>
+                <option value="Gen3 V8 Supercar">Gen 3 V8 Supercar</option>
+                <option value="Custom">Custom</option>
+            </select>
+        </div>
+        <div class="form-row" id="gt3CarRow" style="display:none">
+            <label for="gt3CarSelect">GT3 model:</label>
+            <select id="gt3CarSelect" onchange="updateCarUI()">
+                <option value="Acura NSX GT3">Acura NSX GT3</option>
+                <option value="Ferrari/Audi/Lamborghini/Corvette GT3">Ferrari / Audi / Lamborghini / Corvette</option>
+                <option value="Mercedes/Aston GT3">Mercedes / Aston Martin</option>
+                <option value="Porsche/BMW GT3">Porsche / BMW</option>
+                <option value="Mustang/McLaren GT3">Mustang / McLaren</option>
+            </select>
+        </div>
+        <select id="carSelect" style="display:none">
+            <option value="GTP">GTP</option>
+            <option value="Acura NSX GT3">Acura NSX GT3</option>
+            <option value="Ferrari/Audi/Lamborghini/Corvette GT3">Ferrari/Audi/Lamborghini/Corvette GT3</option>
+            <option value="Mercedes/Aston GT3">Mercedes/Aston GT3</option>
+            <option value="Porsche/BMW GT3">Porsche/BMW GT3</option>
+            <option value="Porsche Cup">Porsche Cup</option>
+            <option value="Mustang/McLaren GT3">Mustang/McLaren GT3</option>
+            <option value="LMP2">LMP2</option>
+            <option value="Gen3 V8 Supercar">Gen3 V8 Supercar</option>
+            <option value="Custom">Custom</option>
+        </select>
+        <div class="form-row">
+            <label for="currentBurnRate">Fuel burn rate (liters per lap):</label>
+            <input type="number" id="currentBurnRate" step="0.01" required>
+        </div>
+        <div class="form-row">
+            <label for="averageLapTime">Average lap time (m:ss.mmm):</label>
+            <input type="text" id="averageLapTime" placeholder="e.g. 1:30.500" required>
+        </div>
+        <div class="form-row">
+            <label id="raceDurationLabel">Race duration (minutes):</label>
+            <div style="display:flex;gap:8px;align-items:center">
+                <input type="number" id="raceDuration" style="width:120px">
+                <input type="number" id="raceLaps" placeholder="e.g. 100" min="1" style="width:120px;display:none">
+                <div id="raceModeToggle" style="display:none;gap:8px;flex-shrink:0">
+                    <button type="button" id="btnTimedRace" class="mode-btn mode-btn-active" onclick="setRaceMode('timed')">Mins</button>
+                    <button type="button" id="btnLapRace" class="mode-btn" onclick="setRaceMode('laps')">Laps</button>
+                </div>
+            </div>
+        </div>
+        <div class="form-row">
+            <label for="pitStopDuration">
+                <div class="tooltip-wrap">
+                    <span id="pitStopLabel">Base pit service time (seconds):</span>
+                    <span class="tooltip-icon">?</span>
+                    <div class="tooltip-box" id="pitStopTooltip">
+<strong>How to measure this</strong>
+                        Enter your full observed pit stop time - from pit entry line to pit exit line, doing a complete stop: full fuel fill AND tyre change.<br><br>
+                        <span class="tip-step">Important: this number is series-specific.</span>
+                        Different rulesets give very different stop times because fuel fill rate and tyre timing vary. Measure your stop in the actual series ruleset you will race under - e.g. NEC stops take much longer than Default because the fuel pump is 3x slower.<br><br>
+                        <strong style="color:var(--accent)">Sequential rules</strong> (Default GT3, Porsche Cup): subtracts tyre time and fuel time separately. Skipping tyres or filling less fuel saves that portion.<br><br>
+                        <strong style="color:var(--accent)">Simultaneous rules</strong> (IMSA / NEC / DTM GT3, GTP, LMP2, Gen3): subtracts only the fuel portion, since tyres happen in parallel. Skipping tyres only helps when fuel time is less than tyre time.<br><br>
+                        Any partial stop is calculated back from your entered full stop time.
+                    </div>
+                </div>
+            </label>
+            <input type="number" id="pitStopDuration" value="60">
+        </div>
+        <div class="form-row" id="customTankRow" style="display:none">
+                <label for="customTankSize">Tank size (litres):</label>
+                <input type="number" id="customTankSize" step="0.1" min="1" placeholder="e.g. 95.0">
+            </div>
+
+        <div class="form-row" id="gt3RulesetRow" style="display:none">
+                <label for="gt3Ruleset">
+                    <div class="tooltip-wrap">
+                        <span>Series ruleset:</span>
+                        <span class="tooltip-icon">?</span>
+                        <div class="tooltip-box">
+                            <strong>iRacing 2026 Season 3 GT3 rules</strong><br><br>
+                            <strong style="color:var(--accent)">Default (sequential)</strong> - fuel fills first, then tyre change. Fuel rate 2.50%/s. Used by most series including Bathurst and other non-branded events.<br><br>
+                            <strong style="color:var(--accent)">IMSA (simultaneous)</strong> - fuel and tyres at same time. Fuel rate 2.50%/s. Used by IMSA events: Watkins Glen 6H, Road America 6H, Petit LeMans.<br><br>
+                            <strong style="color:var(--accent)">NEC (slow fuel)</strong> - simultaneous, but fuel fills at 0.83%/s (~3x slower). Used at the Nurburgring 24H to match real pump speeds.<br><br>
+                            <strong style="color:var(--accent)">DTM (fast tyres)</strong> - simultaneous, fuel rate 2.50%/s, tyre change ~3x faster (~7s vs 20s). Used by DTM series events.<br><br>
+                            <span class="tip-step">Check the Rules tab in-sim to confirm which applies to your event.</span>
+                        </div>
+                    </div>
+                </label>
+                <select id="gt3Ruleset" onchange="updateGT3Ruleset()" style="width:200px">
+                    <option value="default">Default (sequential)</option>
+                    <option value="imsa">IMSA (simultaneous)</option>
+                    <option value="nec">NEC (slow fuel)</option>
+                    <option value="dtm">DTM (fast tyres)</option>
+                </select>
+            </div>
+
+            <div class="form-row" id="cupRulesetRow" style="display:none">
+                <label for="cupRuleset">
+                    <div class="tooltip-wrap">
+                        <span>Series ruleset:</span>
+                        <span class="tooltip-icon">?</span>
+                        <div class="tooltip-box">
+                            <strong>Porsche Cup rules (all sequential)</strong><br><br>
+                            <strong style="color:var(--accent)">Default</strong> - fuel rate 2.27%/s. Used at standard Porsche Cup series events.<br><br>
+                            <strong style="color:var(--accent)">NEC (slow fuel)</strong> - fuel rate 0.76%/s (~3x slower). Used at the Nurburgring 24H.<br><br>
+                            <span class="tip-step">Cup always runs sequential (Fuel Then Tyres).</span>
+                        </div>
+                    </div>
+                </label>
+                <select id="cupRuleset" onchange="updateCupRuleset()" style="width:200px">
+                    <option value="default">Default (2.27%/s)</option>
+                    <option value="nec">NEC (0.76%/s)</option>
+                </select>
+            </div>
+
+        <div class="form-row" id="genericTyreStintRow" style="display:none">
+                <label for="genericTyreStint">
+                    <div class="tooltip-wrap">
+                        <span>Tyre stint strategy:</span>
+                        <span class="tooltip-icon">?</span>
+                        <div class="tooltip-box">
+                            <strong>Double / Triple stinting tyres</strong>
+                            Select which specific pit stops skip the tyre change. Enter stop numbers separated by commas.<br><br>
+                            <span class="tip-step">e.g. "2, 4" skips tyres on stops 2 and 4.</span>
+                            Stops not listed always take tyres. Leave blank for tyres every stop.
+                        </div>
+                    </div>
+                </label>
+                <div style="display:flex;align-items:center;gap:8px">
+                    <select id="genericTyreStint" onchange="updateGenericTyreStint()" style="width:140px">
+                        <option value="none">Every stop</option>
+                        <option value="double">Double stint</option>
+                        <option value="triple">Triple stint</option>
+                        <option value="custom">Custom</option>
+                    </select>
+                    <input type="text" id="genericSkipStops" placeholder="e.g. 2,4,6" style="width:120px;display:none">
+                </div>
+            </div>
+
+        <div class="form-row" id="cupDoubleStintRow" style="display:none">
+                <label for="cupDoubleStint">
+                    <div class="tooltip-wrap">
+                        <span>Double stint tyres:</span>
+                        <span class="tooltip-icon">?</span>
+                        <div class="tooltip-box">
+                            <strong>Double stinting</strong>
+                            Every second stop skips the tyre change — only fuel is taken. Saves ~27s on alternating stops.<br><br>
+                            <span class="tip-step">Set which pit stop number you first skip tyres on.</span>
+                            e.g. "Start skipping from stop 2" means stop 1 = tyres, stop 2 = fuel only, stop 3 = tyres, etc.
+                        </div>
+                    </div>
+                </label>
+                <div style="display:flex;align-items:center;gap:10px">
+                    <input type="checkbox" id="cupDoubleStint" onchange="updateDoubleStint()" style="width:auto;margin:0;cursor:pointer;accent-color:var(--accent)">
+                    <span id="cupDoubleStintLabel" style="font-family:var(--mono);font-size:12px;color:var(--text3)">disabled</span>
+                </div>
+            </div>
+            <div class="form-row" id="cupSkipFromRow" style="display:none">
+                <label for="cupSkipFrom">Start skipping tyres from stop #:</label>
+                <input type="number" id="cupSkipFrom" value="2" min="1" step="1" style="width:80px">
+            </div>
+
+        <div class="form-row" id="cupTyreRow" style="display:none!important">
+                <label for="cupTyreTime">
+                    <div class="tooltip-wrap">
+                        <span>Tyre change time (seconds):</span>
+                        <span class="tooltip-icon">?</span>
+                        <div class="tooltip-box">
+                            <strong>Porsche Cup — sequential stops</strong>
+                            Time for tyres only with zero fuel. Measure it: pit with no fuel and tyres on, time entry to exit line, then subtract your pit lane transit time.<br><br>
+                            <span class="tip-step">Added on top of transit + fuel when last tank ≥ 50L. Skipped when under 50L.</span>
+                        </div>
+                    </div>
+                </label>
+                <input type="number" id="cupTyreTime" value="27" step="1" min="0">
+            </div>
+
+        <div class="form-row" id="bopPctRow">
+            <label for="fuelTankSize">BoP tank adjustment (%):</label>
+            <input type="number" id="fuelTankSize" value="100" step="1" min="1">
+        </div>
+        <div class="form-row" id="tankLitresRow" style="display:none">
+            <label for="tankLitres">Actual tank size (litres):</label>
+            <input type="number" id="tankLitres" step="0.1" value="133" placeholder="e.g. 105.4">
+        </div>
+    </div>
+    <div class="btn-row">
+        <button type="button" class="calc-btn" onclick="calculate()">Calculate Strategy</button>
+        <button type="button" class="reset-btn" onclick="resetForm()">Reset</button>
+    </div>
+    <div id="calculationResult"></div>
+</div>
+<script>
+// Fuel fill rates (seconds per litre) per iRacing 2026 Season 3
+// Reference: https://forums.iracing.com/discussion/97084
+// Default rate = 2.50%/s of 100% BoP tank => 0.4s/L
+// Porsche Cup    = 2.27%/s  => 0.441s/L
+// NEC ruleset    = 0.83%/s  => 1.205s/L  (~3x slower)
+// DTM ruleset    = 2.50%/s  => 0.4s/L    (same fuel, faster tyres via ~3x rate)
+var FUEL_FILL_RATE = 0.4;  // default for GT3/GTP/LMP2/Gen3/Custom
+var CUP_FUEL_FILL_RATE = 0.4005;  // Porsche Cup baseline (2.27%/s of 110L = 0.4005 s/L)
+var NEC_FUEL_FILL_RATE = 1.205;  // NEC slow fuel
+// Tyre change durations (seconds)
+var STD_TYRE_TIME = 20;  // Default GT3 tyre change
+var DTM_TYRE_TIME = 7;   // DTM ultra-fast (~3x rate)
+var CUP_TYRE_TIME = 27;  // Porsche Cup (kept as existing hardcoded default)
+var raceMode = 'timed';
+
+function updateMasterRuleset() {
+    var rs = document.getElementById('masterRuleset').value;
+    var cat = document.getElementById('categorySelect');
+    var currentCat = cat.value;
+
+    // Eligibility per ruleset
+    // Default: all
+    // IMSA:    GT3, GTP, LMP2  (also allow Gen3, Custom as pass-through)
+    // NEC:     GT3, GTP, LMP2, Porsche Cup  (Gen3, Custom pass-through)
+    // DTM:     GT3, GTP, LMP2  (Gen3, Custom pass-through)
+    // Which car categories actually race under each ruleset in iRacing.
+    // Default = anything not tied to a specific series
+    // IMSA    = IMSA WeatherTech (Sebring, Petit LeMans, Watkins Glen) - GT3/GTP/LMP2
+    // NEC     = Nurburgring 24 - GT3/Porsche Cup only (no prototypes at the Ring)
+    // DTM     = DTM series - GT3 only (single-class GT3-based)
+    var eligibility = {
+        'default': ['GTP','GT3','Porsche Cup','LMP2','Gen3 V8 Supercar','Custom'],
+        'imsa':    ['GTP','GT3','LMP2','Custom'],
+        'nec':     ['GT3','Porsche Cup','Custom'],
+        'dtm':     ['GT3','Custom']
+    };
+    var allowed = eligibility[rs] || eligibility['default'];
+
+    // Show/hide category options based on eligibility
+    Array.from(cat.options).forEach(function(opt) {
+        opt.disabled = allowed.indexOf(opt.value) < 0;
+        opt.style.display = opt.disabled ? 'none' : '';
+    });
+
+    // If current category no longer eligible, switch to first eligible
+    if (allowed.indexOf(currentCat) < 0) {
+        cat.value = allowed[0];
+    }
+
+    // Sync the hidden ruleset dropdowns for GT3 and Cup to master
+    document.getElementById('gt3Ruleset').value = rs;
+    // Cup only supports default and nec — clamp others to default
+    var cupRs = (rs === 'nec') ? 'nec' : 'default';
+    document.getElementById('cupRuleset').value = cupRs;
+
+    updateCategoryUI();
+}
+
+function updateCategoryUI() {
+    var cat = document.getElementById('categorySelect').value;
+    var gt3Row = document.getElementById('gt3CarRow');
+    if (cat === 'GT3') {
+        gt3Row.style.display = 'flex';
+        // Sync hidden carSelect to the selected GT3 model
+        document.getElementById('carSelect').value = document.getElementById('gt3CarSelect').value;
+    } else {
+        gt3Row.style.display = 'none';
+        document.getElementById('carSelect').value = cat;
+    }
+    updateCarUI();
+}
+
+function updateCarUI() {
+    // Sync hidden carSelect from category + GT3 model
+    var cat = document.getElementById('categorySelect').value;
+    if (cat === 'GT3') {
+        document.getElementById('carSelect').value = document.getElementById('gt3CarSelect').value;
+    } else {
+        document.getElementById('carSelect').value = cat;
+    }
+    var car      = document.getElementById('carSelect').value;
+    var isGen3   = car === 'Gen3 V8 Supercar';
+    var isCup    = car === 'Porsche Cup';
+    var isCustom = car === 'Custom';
+    var isGT3    = ['Acura NSX GT3','Ferrari/Audi/Lamborghini/Corvette GT3','Mercedes/Aston GT3','Porsche/BMW GT3','Mustang/McLaren GT3'].indexOf(car) >= 0;
+    var isGTP    = car === 'GTP';
+    var isLMP2   = car === 'LMP2';
+    var isProto  = isGTP || isLMP2;
+
+    document.getElementById('raceModeToggle').style.display      = isGen3 ? 'flex' : 'none';
+    document.getElementById('bopPctRow').style.display           = isGen3 ? 'none' : 'flex';
+    document.getElementById('tankLitresRow').style.display       = isGen3 ? 'flex' : 'none';
+    document.getElementById('cupDoubleStintRow').style.display   = isCup  ? 'flex' : 'none';
+    // cupRulesetRow now hidden — master ruleset controls it
+    document.getElementById('cupRulesetRow').style.display       = 'none';
+    document.getElementById('customTankRow').style.display       = isCustom ? 'flex' : 'none';
+    // gt3RulesetRow now hidden — master ruleset controls it
+    document.getElementById('gt3RulesetRow').style.display       = 'none';
+    document.getElementById('genericTyreStintRow').style.display = (isGT3 || isGen3 || isProto) ? 'flex' : 'none';
+
+    if (!isCup) { document.getElementById('cupDoubleStint').checked = false; document.getElementById('cupSkipFromRow').style.display = 'none'; }
+    if (!isGT3 && !isProto) { document.getElementById('gt3Ruleset').value = 'default'; }
+
+    document.getElementById('pitStopLabel').textContent = isCup
+        ? 'Full stop time -- tyres + full fuel (seconds):'
+        : 'Full stop time (seconds):';
+    if (!isGen3) { setRaceMode('timed'); }
+}
+
+function setRaceMode(mode) {
+    raceMode = mode;
+    document.getElementById('raceDuration').style.display   = mode === 'timed' ? 'block' : 'none';
+    document.getElementById('raceLaps').style.display       = mode === 'laps'  ? 'block' : 'none';
+    document.getElementById('raceDurationLabel').textContent = mode === 'timed' ? 'Race duration (minutes):' : 'Race lap count:';
+    document.getElementById('btnTimedRace').className = 'mode-btn' + (mode === 'timed' ? ' mode-btn-active' : '');
+    document.getElementById('btnLapRace').className   = 'mode-btn' + (mode === 'laps'  ? ' mode-btn-active' : '');
+}
+
+function resetForm() {
+    document.getElementById('categorySelect').value = 'GTP';
+    document.getElementById('gt3CarSelect').value   = 'Acura NSX GT3';
+    document.getElementById('carSelect').value       = 'GTP';
+    document.getElementById('currentBurnRate').value = '';
+    document.getElementById('averageLapTime').value  = '';
+    document.getElementById('raceDuration').value    = '';
+    document.getElementById('raceLaps').value        = '';
+    document.getElementById('pitStopDuration').value = '60';
+    document.getElementById('cupTyreTime').value = '27';
+    document.getElementById('customTankSize').value = '';
+    document.getElementById('cupDoubleStint').checked = false;
+    document.getElementById('masterRuleset').value = 'default';
+    document.getElementById('gt3Ruleset').value = 'default';
+    document.getElementById('cupRuleset').value = 'default';
+    document.getElementById('genericTyreStint').value = 'none';
+    document.getElementById('genericSkipStops').value = '';
+    document.getElementById('genericSkipStops').style.display = 'none';
+    document.getElementById('cupSkipFrom').value = '2';
+    document.getElementById('cupSkipFromRow').style.display = 'none';
+    document.getElementById('cupDoubleStintLabel').textContent = 'disabled';
+    document.getElementById('cupDoubleStintLabel').style.color = 'var(--text3)';
+    document.getElementById('fuelTankSize').value    = '100';
+    document.getElementById('tankLitres').value      = '133';
+    document.getElementById('calculationResult').innerHTML = '';
+    updateCarUI();
+}
+
+updateCarUI();
+
+function updateGT3Ruleset() {
+    // no visual feedback needed - selected value shows in dropdown
+}
+
+function updateCupRuleset() {
+    // no visual feedback needed - selected value shows in dropdown
+}
+
+function updateGenericTyreStint() {
+    var val = document.getElementById('genericTyreStint').value;
+    document.getElementById('genericSkipStops').style.display = val === 'custom' ? 'block' : 'none';
+}
+
+function updateDoubleStint() {
+    var on = document.getElementById('cupDoubleStint').checked;
+    document.getElementById('cupSkipFromRow').style.display = on ? 'flex' : 'none';
+    document.getElementById('cupDoubleStintLabel').textContent = on ? 'enabled' : 'disabled';
+    document.getElementById('cupDoubleStintLabel').style.color = on ? 'var(--green)' : 'var(--text3)';
+}
+
+function calculate() {
+    var currentBurnRate = parseFloat(document.getElementById('currentBurnRate').value);
+    var averageLapTimeString = document.getElementById('averageLapTime').value.trim();
+    var lapMatch = averageLapTimeString.match(/^(\d+):(\d{1,2})\.(\d{1,3})$/);
+    var averageLapTimeMinutes      = lapMatch ? parseInt(lapMatch[1]) : NaN;
+    var averageLapTimeSeconds      = lapMatch ? parseInt(lapMatch[2]) : NaN;
+    var averageLapTimeMilliseconds = lapMatch ? parseInt(lapMatch[3].padEnd(3,'0')) : NaN;
+    var pitStopDuration = parseInt(document.getElementById('pitStopDuration').value);
+    var cupTyreTime    = parseInt(document.getElementById('cupTyreTime').value) || 0;
+    var cupDoubleStint   = document.getElementById('cupDoubleStint').checked;
+    var cupSkipFrom      = parseInt(document.getElementById('cupSkipFrom').value) || 2;
+    var selectedCar      = document.getElementById('carSelect').value;
+    var isGen3           = selectedCar === 'Gen3 V8 Supercar';
+    var gt3Ruleset       = document.getElementById('gt3Ruleset').value;
+    // GT3 sequential logic (adds 20s tyre time) only applies when a GT3 car is selected
+    // AND the ruleset is Default. IMSA = simultaneous. Non-GT3 cars always simultaneous.
+    var isGT3Selected    = ['Acura NSX GT3','Ferrari/Audi/Lamborghini/Corvette GT3','Mercedes/Aston GT3','Porsche/BMW GT3','Mustang/McLaren GT3'].indexOf(selectedCar) >= 0;
+    var isGTPSelected    = selectedCar === 'GTP';
+    var isLMP2Selected   = selectedCar === 'LMP2';
+    var isProtoWithRules = isGTPSelected || isLMP2Selected;
+
+    // Read master ruleset directly since GTP/LMP2 use master (no per-class dropdown yet)
+    var masterRs         = document.getElementById('masterRuleset').value;
+    var activeRs         = isGT3Selected ? gt3Ruleset : masterRs;
+
+    // spa24Mode signals sequential model (Default ruleset). Applies to GT3, GTP, LMP2.
+    var spa24Mode        = (isGT3Selected || isProtoWithRules) && activeRs === 'default';
+    // Effective GT3 ruleset for this run: for GTP/LMP2 use masterRs so tyre time gets applied
+    var effectiveGT3Ruleset = (isGT3Selected || isProtoWithRules) ? activeRs : null;
+    var cupRuleset = document.getElementById('cupRuleset').value;
+    var genericTyreStint = document.getElementById('genericTyreStint').value;
+    var genericSkipStops = document.getElementById('genericSkipStops').value;
+
+    var lapTimeInMinutes = averageLapTimeMinutes + (averageLapTimeSeconds / 60) + (averageLapTimeMilliseconds / 60000);
+
+    var raceDuration = 0;
+    var raceLapCount = 0;
+    if (isGen3 && raceMode === 'laps') {
+        raceLapCount = parseInt(document.getElementById('raceLaps').value);
+        if (isNaN(raceLapCount) || raceLapCount < 1) {
+            document.getElementById('calculationResult').innerHTML = '<div class="error-msg">&#9888; Please enter a valid lap count.</div>';
+            return;
+        }
+        raceDuration = raceLapCount;  // pass lap count directly, buildScenarios will handle it
+    } else {
+        raceDuration = parseInt(document.getElementById('raceDuration').value);
+    }
+
+    var tankSize;
+    if (isGen3) {
+        var litresVal = parseFloat(document.getElementById('tankLitres').value);
+        tankSize = (!isNaN(litresVal) && litresVal > 0) ? litresVal : 133;
+    } else if (selectedCar === 'Custom') {
+        var customVal = parseFloat(document.getElementById('customTankSize').value);
+        if (isNaN(customVal) || customVal <= 0) {
+            document.getElementById('calculationResult').innerHTML = '<div class="error-msg">&#9888; Please enter a valid tank size for your custom car.</div>';
+            return;
+        }
+        tankSize = customVal;
+    } else {
+        var adj = parseFloat(document.getElementById('fuelTankSize').value) / 100;
+        tankSize = getTankSize(selectedCar) * adj;
+    }
+
+    if (isNaN(currentBurnRate) || isNaN(averageLapTimeMinutes) || isNaN(averageLapTimeSeconds) ||
+        isNaN(averageLapTimeMilliseconds) || isNaN(raceDuration) || isNaN(pitStopDuration) || raceDuration <= 0) {
+        document.getElementById('calculationResult').innerHTML = '<div class="error-msg">&#9888; Please fill in all fields correctly before calculating.</div>';
+        return;
+    }
+
+    var result = '<h2>Fuel Burn Rate and Stint Strategy</h2>';
+    var calcOutput = { totals: null };
+    result += performCalculations(selectedCar, tankSize, currentBurnRate, averageLapTimeMinutes, averageLapTimeSeconds, averageLapTimeMilliseconds, raceDuration, pitStopDuration, lapTimeInMinutes, raceLapCount, cupTyreTime, cupDoubleStint, cupSkipFrom, spa24Mode, genericTyreStint, genericSkipStops, calcOutput, effectiveGT3Ruleset, cupRuleset);
+
+    var totals;
+    if (raceLapCount > 0) {
+        totals = { totalRaceLaps: raceLapCount, totalRaceFuel: raceLapCount * currentBurnRate };
+    } else if (calcOutput.totals) {
+        totals = calcOutput.totals;
+    } else {
+        totals = calculateTotalRaceLaps(lapTimeInMinutes, currentBurnRate, raceDuration, pitStopDuration, tankSize);
+    }
+
+    result += '<h2>Total Race Details</h2>';
+    result += '<div class="total-race-detail animate-in">';
+    result += '<div class="stat"><div class="stat-label">Total Race Laps</div><div class="stat-value">' + totals.totalRaceLaps + '</div></div>';
+    result += '<div class="stat"><div class="stat-label">Total Race Fuel Needed</div><div class="stat-value">' + totals.totalRaceFuel.toFixed(2) + '<span>Litres</span></div></div>';
+    result += '</div>';
+    document.getElementById('calculationResult').innerHTML = result;
+}
+
+function simulateStints(stintLaps, lapTimeMins, pitStopMins, raceDurationMins) {
+    var elapsed = 0, stints = 0, lastStintLaps = 0, firstStint = true;
+    while (true) {
+        if (!firstStint) { elapsed += pitStopMins; if (elapsed >= raceDurationMins) break; }
+        firstStint = false;
+        var lapsThisStint = 0;
+        for (var i = 0; i < stintLaps; i++) {
+            if (elapsed + lapTimeMins > raceDurationMins) break;
+            elapsed += lapTimeMins; lapsThisStint++;
+        }
+        if (lapsThisStint > 0) { stints++; lastStintLaps = lapsThisStint; }
+        if (elapsed >= raceDurationMins) break;
+        if (elapsed + pitStopMins + lapTimeMins > raceDurationMins) break;
+    }
+    return { stints: stints, lastStintLaps: lastStintLaps };
+}
+
+// baseServiceSecs IS the full stop time (includes full tank fill)
+// partial fill = proportionally less time
+// baseServiceSecs = user's full observed stop time (transit + full tank + tyres)
+// Sequential (Cup, GT3 Default): stop = transit + fuel_time + tyre_time
+// Simultaneous (GT3 IMSA/NEC/DTM, GTP, LMP2, Gen3): stop = transit + max(fuel_time, tyre_time)
+// fillRate defaults to FUEL_FILL_RATE if not passed (backwards compat)
+function fullPitTimeSecs(baseServiceSecs, tankSize, tyreTime, isSequential) {
+    return baseServiceSecs;  // user-entered full stop is always the ceiling
+}
+function lastPitTimeSecs(baseServiceSecs, lastTankLitres, tankSize, tyreTime, isSequential, isSimultaneousWithTyres, withTyres, fillRate) {
+    var rate = fillRate || FUEL_FILL_RATE;
+    var fuelTime = lastTankLitres * rate;
+    var fullFuel = tankSize * rate;
+
+    if (isSequential) {
+        // Cup or GT3 Default: transit + fuel + (tyres if applicable)
+        var transitSeq = baseServiceSecs - tyreTime - fullFuel;
+        return transitSeq + fuelTime + (withTyres ? tyreTime : 0);
+    }
+    if (isSimultaneousWithTyres) {
+        // Simultaneous with tyres: transit + max(fuel_time, tyre_time if fitting tyres)
+        var fullStopComponent = Math.max(fullFuel, tyreTime);
+        var transitSim = baseServiceSecs - fullStopComponent;
+        var thisStopComponent = withTyres ? Math.max(fuelTime, tyreTime) : fuelTime;
+        return transitSim + thisStopComponent;
+    }
+    // Simultaneous no tyre model (GTP/LMP2/Gen3/Custom): just fuel time varies
+    var transit = baseServiceSecs - fullFuel;
+    return transit + fuelTime;
+}
+
+function fmtSecs(totalSeconds) {
+    var m  = Math.floor(totalSeconds / 60);
+    var s  = Math.floor(totalSeconds % 60);
+    var ms = Math.round((totalSeconds % 1) * 1000);
+    return m + ':' + String(s).padStart(2,'0') + '.' + String(ms).padStart(3,'0');
+}
+
+function simulateStintsByLaps(stintLaps, totalRaceLaps) {
+    // For lap-count races: simply divide laps into stints
+    var stints = 0, lapsDone = 0, lastStintLaps = 0;
+    while (lapsDone < totalRaceLaps) {
+        var lapsThisStint = Math.min(stintLaps, totalRaceLaps - lapsDone);
+        lapsDone += lapsThisStint;
+        stints++;
+        lastStintLaps = lapsThisStint;
+    }
+    return { stints: stints, lastStintLaps: lastStintLaps };
+}
+
+function buildScenarios(tankSize, currentBurnRate, lapTimeMins, baseServiceSecs, raceDuration, raceLapCount, isCup, tyreTime, doubleStint, skipFrom, isSpa24, skipStopsSet, genericTyreStintValue, fillRate) {
+    var isCupLocal      = isCup || false;
+    var tyreTimeLocal   = tyreTime || 0;
+    var tyreTimeLocal2Calc = isCupLocal ? tyreTimeLocal : ((isSpa24 || false) ? 20 : 0);
+    var pitStopMins     = baseServiceSecs / 60;
+    // Base laps = how many laps you can do at your actual burn rate before tank is empty
+    var baseLaps = Math.floor(tankSize / currentBurnRate);
+    var rows = [];
+    for (var additionalLaps = 0; additionalLaps <= 4; additionalLaps++) {
+        var totalLaps          = baseLaps + additionalLaps;
+        // Base row: show actual burn rate. Saving rows: use full tank / laps
+        // so saving scenarios show how little you need to save to use the full tank
+        var fuelBurnRatePerLap = additionalLaps === 0 ? currentBurnRate : tankSize / totalLaps;
+        var fuelSave           = additionalLaps === 0 ? 0 : currentBurnRate - fuelBurnRatePerLap;
+        // Effective pit stop time — average across the stint pattern
+        // Double stint: skip every 2nd tyre = avg of full + no-tyre stops
+        // Triple stint: skip 2 of 3 = 1/3 full + 2/3 no-tyre
+        // Custom: use full stop average (conservative first pass, corrected below)
+        var noTyreStopTimeCalc = fullPitTimeSecs(baseServiceSecs, tankSize, tyreTimeLocal, isCupLocal || (isSpa24 || false)) - tyreTimeLocal2Calc;
+        var effPitStopMins = pitStopMins;
+        if ((isCupLocal && doubleStint) || (!isCupLocal && (genericTyreStintValue === 'double'))) {
+            effPitStopMins = (pitStopMins + noTyreStopTimeCalc / 60) / 2;
+        } else if (!isCupLocal && genericTyreStintValue === 'triple') {
+            effPitStopMins = (pitStopMins + 2 * noTyreStopTimeCalc / 60) / 3;
+        }
+
+        var sim = raceLapCount > 0
+            ? simulateStintsByLaps(totalLaps, raceLapCount)
+            : simulateStints(totalLaps, lapTimeMins, effPitStopMins, raceDuration);
+        var pitStops           = Math.max(0, sim.stints - 1);
+        var lastTankLitres     = Math.min(sim.lastStintLaps * fuelBurnRatePerLap, tankSize);
+        var isCupLocal     = isCup || false;
+        var isSpa24Local   = isSpa24 || false;
+        var skipStopsLocal = skipStopsSet || {};
+        var tyreTimeLocal2 = isCupLocal ? tyreTimeLocal : (isSpa24Local ? 20 : 0);
+        var fullStopTime   = baseServiceSecs;
+        var isSequential   = isCupLocal || isSpa24Local;
+        // GT3 IMSA (not Cup, not sequential/Spa24) is simultaneous with tyre time
+        var isSimGT3       = !isCupLocal && !isSpa24Local && (tyreTime > 0);
+        var noTyreStopTime;
+        if (isSequential) {
+            noTyreStopTime = fullStopTime - tyreTimeLocal2;  // full sub tyre time
+        } else if (isSimGT3) {
+            // Simultaneous - skipping tyres only saves time if tyre time > fuel time
+            var fullFuelSecs = tankSize * (fillRate || FUEL_FILL_RATE);
+            noTyreStopTime = fullStopTime - Math.max(0, tyreTimeLocal2 - fullFuelSecs);
+        } else {
+            noTyreStopTime = fullStopTime;
+        }
+        var lastStopTime   = lastPitTimeSecs(baseServiceSecs, lastTankLitres, tankSize, tyreTimeLocal2, isSequential, isSimGT3, true, fillRate);
+        var totalPitTimeSecs = 0;
+        if (pitStops > 0) {
+            for (var s = 1; s <= pitStops - 1; s++) {
+                var skipTyres = false;
+                if (isCupLocal && (doubleStint || false)) {
+                    var sf = skipFrom || 2;
+                    skipTyres = s >= sf && (s - sf) % 2 === 0;
+                } else if (!isCupLocal && skipStopsLocal[s]) {
+                    skipTyres = true;
+                }
+                totalPitTimeSecs += skipTyres ? noTyreStopTime : fullStopTime;
+            }
+            totalPitTimeSecs += lastStopTime;
+        }
+        rows.push({ totalLaps:totalLaps, fuelBurnRatePerLap:fuelBurnRatePerLap, fuelSave:fuelSave, stints:sim.stints, pitStops:pitStops, lastTankLitres:lastTankLitres, totalPitTimeSecs:totalPitTimeSecs, isBase:additionalLaps===0 });
+    }
+    return rows;
+}
+
+function performCalculations(carName, tankSize, currentBurnRate, avgMin, avgSec, avgMs, raceDuration, baseServiceSecs, lapTimeMins, raceLapCount, cupTyreTime, cupDoubleStint, cupSkipFrom, spa24Mode, genericTyreStint, genericSkipStops, calcOutput, gt3RulesetKey, cupRulesetKey) {
+    var isCup    = carName === 'Porsche Cup';
+    var isSpa24  = spa24Mode || false;
+
+    // Per-ruleset fuel fill rate (s/L) and tyre change time (s)
+    // Falls back to defaults if no GT3 ruleset in effect
+    var runFuelRate = FUEL_FILL_RATE;      // 0.4 s/L default
+    var runTyreTime = STD_TYRE_TIME;       // 20s default
+    if (isCup) {
+        var cupBaseTank = 110;
+        runFuelRate = (cupRulesetKey === 'nec')
+            ? (100 / 0.76) / cupBaseTank    // 1.196 s/L
+            : (100 / 2.27) / cupBaseTank;   // 0.4005 s/L
+        runTyreTime = cupTyreTime || CUP_TYRE_TIME;
+    } else if (carName === 'GTP' || carName === 'LMP2') {
+        // GTP and LMP2 both use 2.50%/s across all their rulesets (Default, IMSA)
+        // Tyre change time is a placeholder — using GT3's 20s until measured
+        // NOTE: Waffles to measure the actual tyre change time for GTP and LMP2
+        runFuelRate = FUEL_FILL_RATE;   // 0.4 s/L
+        runTyreTime = STD_TYRE_TIME;    // 20s placeholder
+    } else if (gt3RulesetKey === 'nec') {
+        runFuelRate = NEC_FUEL_FILL_RATE;  // 1.205 s/L slow fuel
+        runTyreTime = STD_TYRE_TIME;
+    } else if (gt3RulesetKey === 'dtm') {
+        runFuelRate = FUEL_FILL_RATE;      // 0.4 s/L
+        runTyreTime = DTM_TYRE_TIME;       // ~7s fast tyres
+    }
+    var spa24TyreTime = runTyreTime;  // tyre time under sequential Default rules
+
+    // Build skip stops set for generic tyre stinting
+    var skipStopsSet = {};
+    if (!isCup) {
+        if (genericTyreStint === 'double') {
+            // skip every 2nd stop: 2,4,6,8...
+            for (var s = 2; s <= 100; s += 2) skipStopsSet[s] = true;
+        } else if (genericTyreStint === 'triple') {
+            // skip every 2nd and 3rd: 2,3,5,6,8,9...
+            for (var s = 1; s <= 100; s++) { if (s % 3 !== 1) skipStopsSet[s] = true; }
+        } else if (genericTyreStint === 'custom' && genericSkipStops) {
+            genericSkipStops.split(',').forEach(function(n) {
+                var num = parseInt(n.trim());
+                if (!isNaN(num)) skipStopsSet[num] = true;
+            });
+        }
+    }
+
+    var tyreTime;
+    if (isCup) tyreTime = cupTyreTime || 27;
+    else if (isSpa24) tyreTime = spa24TyreTime;  // Sequential GT3
+    else {
+        // Simultaneous GT3 — use 20s tyre time for skip-tyres calculations
+        // Only set if this is a GT3 car (not GTP/LMP2/Gen3/Custom)
+        var isGT3Car = ['Acura NSX GT3','Ferrari/Audi/Lamborghini/Corvette GT3','Mercedes/Aston GT3','Porsche/BMW GT3','Mustang/McLaren GT3'].indexOf(carName) >= 0;
+        tyreTime = isGT3Car ? spa24TyreTime : 0;
+    }
+    var doubleStint = isCup ? (cupDoubleStint || false) : false;
+    var skipFrom    = isCup ? (cupSkipFrom || 2) : 2;
+    var scenarios = buildScenarios(tankSize, currentBurnRate, lapTimeMins, baseServiceSecs, raceDuration, raceLapCount || 0, isCup, tyreTime, doubleStint, skipFrom, isSpa24, skipStopsSet, genericTyreStint, runFuelRate);
+
+    // Compute totals from the base scenario (index 0) directly from sim result
+    if (calcOutput && scenarios.length > 0) {
+        var base = scenarios[0];
+        var lastLaps = base.fuelBurnRatePerLap > 0 ? Math.round(base.lastTankLitres / base.fuelBurnRatePerLap) : base.totalLaps;
+        var totalLaps = Math.max(0, base.stints - 1) * base.totalLaps + lastLaps;
+        calcOutput.totals = { totalRaceLaps: totalLaps, totalRaceFuel: totalLaps * currentBurnRate };
+    }
+
+    var result = '<p class="car-label">Car: ' + carName + '</p>';
+    result += '<table id="strategyTable"><thead><tr><th>Laps / Tank</th><th>Burn Rate (L / Lap)</th><th>Fuel Save (L / Lap)</th><th>Pit Stops</th><th>Pit Time Cost</th><th>Last Tank (L)</th><th>Stints</th></tr></thead><tbody>';
+    for (var i = 0; i < scenarios.length; i++) {
+        var sc = scenarios[i];
+        var fuelSaveCell = sc.isBase ? '<td class="base-label">Base</td>' : '<td class="fuel-save-val">' + sc.fuelSave.toFixed(3) + '</td>';
+        var pitTimeCell  = sc.pitStops === 0 ? '<td class="base-label">&#8212;</td>' : '<td class="pit-time-val">' + fmtSecs(sc.totalPitTimeSecs) + '</td>';
+        var lastTankCell = sc.pitStops === 0 ? '<td class="base-label">Full tank</td>' : '<td class="last-tank-val">' + sc.lastTankLitres.toFixed(2) + ' L</td>';
+        var rowClass = sc.isBase ? 'base-row animate-in' : 'animate-in';
+        result += '<tr class="' + rowClass + '"><td>' + sc.totalLaps + '</td><td>' + sc.fuelBurnRatePerLap.toFixed(3) + '</td>' + fuelSaveCell + '<td>' + sc.pitStops + '</td>' + pitTimeCell + lastTankCell + '<td>' + sc.stints + '</td></tr>';
+    }
+    result += '</tbody></table>';
+    result += '<br><button type="button" class="discord-btn" onclick="copyToDiscord()">&#128203; Copy Data</button>';
+    result += '<h2>Last Tank per Scenario</h2><div class="last-tank-cards animate-in">';
+    for (var j = 0; j < scenarios.length; j++) {
+        var sc2 = scenarios[j];
+        var label = sc2.isBase ? 'Base' : '+' + j + ' lap' + (j > 1 ? 's' : '');
+        var litres = sc2.pitStops === 0 ? 'Full tank' : sc2.lastTankLitres.toFixed(2) + ' L';
+        var lastPitSequential = isCup || isSpa24;
+        var lastPitSimGT3     = !isCup && !isSpa24 && tyreTime > 0;
+        var lastPit = sc2.pitStops === 0 ? '&#8212;' : fmtSecs(lastPitTimeSecs(baseServiceSecs, sc2.lastTankLitres, tankSize, tyreTime, lastPitSequential, lastPitSimGT3, true, runFuelRate));
+        var tyreNoteHtml = '';
+        if (carName === 'Porsche Cup' && sc2.pitStops > 0) {
+            var tyresOn = sc2.lastTankLitres >= 50;
+            var tyreClass = tyresOn ? 'tyres-on' : 'tyres-off';
+            var tyreLabel = tyresOn ? '+ TYRES' : 'FUEL ONLY';
+            var tyreTip = tyresOn
+                ? 'Last stop is ' + sc2.lastTankLitres.toFixed(1) + 'L -- over 50L so tyres will be fitted. Porsche Cup does tyres and fuel sequentially so tyre time is included in your base pit time.'
+                : 'Last stop is only ' + sc2.lastTankLitres.toFixed(1) + 'L -- under 50L so tyres will be skipped. Porsche Cup cannot do tyres and fuel simultaneously, so skipping tyres saves you that time.';
+            tyreNoteHtml = '<span class="card-tyre-note ' + tyreClass + '">' + tyreLabel + '<span class="card-tip">' + tyreTip + '</span></span>';
+        }
+        result += '<div class="last-tank-card' + (sc2.isBase ? ' card-base' : '') + '"><div class="card-scenario">' + label + '</div><div class="card-laps">' + sc2.totalLaps + ' laps/stint</div><div class="card-litres">' + litres + '</div><div class="card-pit-label">Last pit duration</div><div class="card-pit-time">' + lastPit + '</div>' + tyreNoteHtml + '</div>';
+    }
+    result += '</div>';
+    return result;
+}
+
+function calculateTotalRaceLaps(lapTimeInMinutes, burnRate, raceDuration, pitStopDuration, tankSize) {
+    var totalRaceLaps = Math.floor(raceDuration / lapTimeInMinutes);
+    var totalPitStops = Math.floor(totalRaceLaps / Math.floor(tankSize / burnRate)) - 1;
+    var totalPitTime  = totalPitStops * (pitStopDuration / 60);
+    totalRaceLaps = Math.floor((raceDuration - totalPitTime) / lapTimeInMinutes);
+    if ((raceDuration - totalPitTime) % lapTimeInMinutes > 0) totalRaceLaps += 1;
+    return { totalRaceLaps: totalRaceLaps, totalRaceFuel: totalRaceLaps * burnRate };
+}
+
+function copyToDiscord() {
+    var table = document.getElementById('strategyTable');
+    if (!table) return;
+
+    // Gather header info from car label
+    var carLabel = document.querySelector('.car-label');
+    var carName  = carLabel ? carLabel.textContent.trim() : '';
+
+    // Build header info
+    var burnRate = document.getElementById('currentBurnRate').value;
+    var lapTime  = document.getElementById('averageLapTime').value;
+    var raceDur  = document.getElementById('raceDuration') && document.getElementById('raceDuration').style.display !== 'none'
+        ? document.getElementById('raceDuration').value + ' mins'
+        : document.getElementById('raceLaps').value + ' laps';
+    var pitTime  = document.getElementById('pitStopDuration').value;
+
+    var lines = [];
+    lines.push('AWR Endurance Fuel Strategy');
+    lines.push('Calculator: https://clintcollard.github.io/AWRFuelcalc/');
+    lines.push(carName + ' | Lap: ' + lapTime + ' | Burn: ' + burnRate + 'L/lap | Race: ' + raceDur + ' | Pit base: ' + pitTime + 's');
+    lines.push('');
+
+    // Column headers
+    var headers = ['Laps/Tank', 'Burn L/Lap', 'Save L/Lap', 'Pit Stops', 'Pit Time    ', 'Last Tank  ', 'Stints'];
+    var widths  = [10, 11, 11, 10, 13, 12, 7];
+
+    function pad(str, len) {
+        str = String(str);
+        return str.length >= len ? str.slice(0, len) : str + ' '.repeat(len - str.length);
+    }
+
+    var headerRow = headers.map(function(h, i) { return pad(h, widths[i]); }).join(' ');
+    var divider   = widths.map(function(w) { return '-'.repeat(w); }).join(' ');
+    lines.push(headerRow);
+    lines.push(divider);
+
+    // Data rows
+    var rows = table.querySelectorAll('tbody tr');
+    rows.forEach(function(row) {
+        var cells = row.querySelectorAll('td');
+        if (cells.length < 7) return;
+        var vals = [
+            cells[0].textContent.trim(),
+            cells[1].textContent.trim(),
+            cells[2].textContent.trim(),
+            cells[3].textContent.trim(),
+            cells[4].textContent.trim(),
+            cells[5].textContent.trim(),
+            cells[6].textContent.trim()
+        ];
+        lines.push(vals.map(function(v, i) { return pad(v, widths[i]); }).join(' '));
+    });
+
+    var tick = String.fromCharCode(96);
+    var tick3 = tick+tick+tick;
+    var text = tick3 + '\n' + lines.join('\n') + '\n' + tick3;
+
+    navigator.clipboard.writeText(text).then(function() {
+        var btn = document.querySelector('.discord-btn');
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(function() {
+            btn.innerHTML = '&#128203; Copy Data';
+            btn.classList.remove('copied');
+        }, 2000);
+    });
+}
+
+function getTankSize(carName) {
+    var tankSizes = {"GTP":89,"Acura NSX GT3":112,"Ferrari/Audi/Lamborghini/Corvette GT3":104,"Mercedes/Aston GT3":106,"Porsche/BMW GT3":100,"Mustang/McLaren GT3":110,"Porsche Cup":110,"LMP2":75,"Gen3 V8 Supercar":133,"Custom":0};
+    return tankSizes[carName] || 0;
+}
+</script>
+</body>
+</html>
